@@ -1,0 +1,9 @@
+,parm_cd_NWIS,parm_cd_STORET,description,unit_NWIS,unit_STORET,conversion
+0,915,91051,"Calcium, water, filtered, milligrams per liter",mg/l,ug/l,1000
+1,925,91052,"Magnesium, water, filtered, milligrams per liter",mg/l,ug/l,1000
+2,930,91053,"Sodium, water, filtered, milligrams per liter",mg/l,ug/l,1000
+3,935,91054,"Potassium, water, filtered, milligrams per liter",mg/l,ug/l,1000
+5,916,52501,"Calcium, water, unfiltered, milligrams per liter",mg/l,ug/l,1000
+6,927,52502,"Magnesium, water, unfiltered, milligrams per liter",mg/l,ug/l,1000
+7,929,52504,"Sodium, water, unfiltered, milligrams per liter",mg/l,ug/l,1000
+8,937,52503,"Potassium, water, unfiltered, milligrams per liter",mg/l,ug/l,1000

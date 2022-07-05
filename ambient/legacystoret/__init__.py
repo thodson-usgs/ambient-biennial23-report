@@ -1,10 +1,10 @@
 import pandas as pd
 
-from awqmn import storet, sites, crosswalk
-from awqmn.legacystoret import cols, cols_2
+from ambient import storet, sites, crosswalk
+from ambient.legacystoret import cols, cols_2
 
-from awqmn.storet.cols import group as group_cols
-from awqmn.nwis import _check_lookup_table
+from ambient.storet.cols import group as group_cols
+from ambient.nwis import _check_lookup_table
 
 censor_codes = ['K','U','M']
 

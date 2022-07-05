@@ -1,4 +1,4 @@
-from awqmn.crosswalk import cols
+from ambient.crosswalk import cols
 
 
 def analysis_name(record):

@@ -1,6 +1,6 @@
 #table = read in dict and ignore nans from data
-from awqmn.sites import cols
-from awqmn import storet
+from ambient.sites import cols
+from ambient import storet
 
 def merge_site_info(df, site_df,  org='IEPA'):
     """ Return lat, lon, and huc8 id associated with a IEPA site.

@@ -1,5 +1,5 @@
 from trend import seasonal_sen_slope, seasonal_mann_kendall
-from awqmn import storet
+from ambient import storet
 import pandas as pd
 
 def water_year_start(year):

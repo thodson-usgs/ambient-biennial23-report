@@ -1,10 +1,10 @@
 import pandas as pd
 
-from awqmn import storet
-from awqmn import sites
-from awqmn import crosswalk
-from awqmn.nwis import cols
-from awqmn.storet.cols import group as group_cols
+from ambient import storet
+from ambient import sites
+from ambient import crosswalk
+from ambient.nwis import cols
+from ambient.storet.cols import group as group_cols
 
 
 def to_storet(df, crosswalk_df, storet_site_id=None):
@@ -70,7 +70,7 @@ def conversion_factor(df, units_df, parameter_col):
 
 
 def crosswalkable(df, crosswalk_df, inverse=False):
-    """List all NWIS parameter codes in awqmn.misc.param_dict.
+    """List all NWIS parameter codes in ambient.misc.param_dict.
 
     Parameters
     ----------

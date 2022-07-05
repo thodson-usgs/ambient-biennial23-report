@@ -4,9 +4,9 @@ from shapely.geometry import Point
 
 import matplotlib.pyplot as plt
 
-from awqmn import sites 
-from awqmn.trend import max_trend, max_egret_trend, max_egret_yield_trend
-from awqmn import crosswalk
+from ambient import sites 
+from ambient.trend import max_trend, max_egret_trend, max_egret_yield_trend
+from ambient import crosswalk
 
 
 def plot_watersheds(huc8, flowline=None, state=None, ax=None, 

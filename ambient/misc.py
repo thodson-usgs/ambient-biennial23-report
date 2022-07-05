@@ -1,4 +1,4 @@
-from awqmn import storet, sites, legacystoret, nwis
+from ambient import storet, sites, legacystoret, nwis
 
 import pandas as pd
 import numpy as np
@@ -6,12 +6,14 @@ from math import nan
 from sqlalchemy.types import Float, Boolean, Date, String
 
 
-def fill_merged_result_table(con, site_df, crosswalk_df, units_df, wrtds=False, results=True):
+def fill_merged_result_table(con, site_df, crosswalk_df, units_df, schema, wrtds=False, results=True):
     """
     """
     for i, site in site_df.iterrows():
         _fill_merged_result_table_for_site(con, site, crosswalk_df,
-                                           units_df, wrtds=wrtds, results=results)
+                                           units_df,
+                                           schema=schema,
+                                           wrtds=wrtds, results=results)
 
 def _fill_merged_result_table_for_site(con, site,
                                        crosswalk_df, units_df,
@@ -19,12 +21,9 @@ def _fill_merged_result_table_for_site(con, site,
                                        results=True,
                                        schema=None):
     # TODO assert that merged_storet exists with generic check function
-    if schema:
-        schema_pre = schema + '.'
-
     site_name = 'IL_EPA_WQX-' + site[sites.cols.storet_id]
     query = f"""
-    SELECT * FROM {schema_pre}merged_storet
+    SELECT * FROM {schema}.merged_storet
     WHERE "MonitoringLocationIdentifier" = '{site_name}';
     """
     storet_df = pd.read_sql_query(query, con)
@@ -45,7 +44,7 @@ def _fill_merged_result_table_for_site(con, site,
 
         values_df.to_sql('merged_results', con=con, schema=schema, if_exists='append')
         flags_df.to_sql('merged_flags', con=con, schema=schema, if_exists='append')
-
+    
     if wrtds and site[sites.cols.gage_id] is not np.nan:
         values2, flags2 = storet.site_to_wrtds(storet_df, crosswalk_df, site)
 
@@ -58,12 +57,10 @@ def _fill_merged_result_table_for_site(con, site,
 def create_wrtds_table(con, crosswalk_df, schema):
     """ Creates wrtds table in db
     """
-    if schema:
-        schema_pre = schema + '.'
 
     query = f"""
     SELECT DISTINCT "{storet.cols.char}","{storet.cols.frac}","{storet.cols.units}"
-    FROM {schema_pre}merged_storet;
+    FROM {schema}.merged_storet;
     """
     df = pd.read_sql_query(query, con=con)
     params = storet._lookup_nwis_param(df, crosswalk_df)
@@ -89,11 +86,8 @@ def create_merged_result_table(con, schema):
     """Create merged_results and merged_flags tables.
     Must make merged_storet first
     """
-    if schema:
-        schema_pre = schema + '.'
-
-    query = """
-    SELECT DISTINCT "CharacteristicName","ResultSampleFractionText" FROM {schema_pre}merged_storet;
+    query = f"""
+    SELECT DISTINCT "CharacteristicName","ResultSampleFractionText" FROM {schema}.merged_storet;
     """
     df = pd.read_sql_query(query, con=con)
     df[storet.cols.frac] = df[storet.cols.frac].replace(np.nan,'')
@@ -133,12 +127,14 @@ def update_merged_storet_table(con, site_df, crosswalk_df, units_df, schema, leg
                                            crosswalk_df,
                                            units_df,
                                            legacy=legacy)
+        
+        #import pdb; pdb.set_trace()
+        if not storet_df.empty:
+            storet_df.to_sql(merged_table_name, con=con, schema=schema,
+                             if_exists='append', index=False)
 
-        storet_df.to_sql(merged_table_name, con=con, schema=schema,
-                         if_exists='append', index=False)
-
-    _update_merged_storet_with_PP(con, table=merged_table_name)
-    _update_merged_storet_with_TN(con, table=merged_table_name)
+    _update_merged_storet_with_PP(con, schema=schema, table=merged_table_name)
+    _update_merged_storet_with_TN(con, schema=schema, table=merged_table_name)
 
 
 def _update_merged_storet_with_PP(con, schema, table='merged_storet', censor_limit=0.01):
@@ -162,7 +158,8 @@ def _update_merged_storet_with_PP(con, schema, table='merged_storet', censor_lim
                           'MonitoringLocationIdentifier','ResultMeasure/MeasureUnitCode'],
                       suffixes=('','_y'))
 
-    susP = test['ResultMeasureValue'] - test['ResultMeasureValue_y']
+    #XXX Why is ResultMEasureValue a str not a float by default. 
+    susP = test['ResultMeasureValue'].astype(float) - test['ResultMeasureValue_y'].astype(float)
 
     out = pd.DataFrame(columns=tp_df.columns)
     out[storet.cols.result] = susP.values
@@ -208,8 +205,9 @@ def _update_merged_storet_with_TN(con, schema, table='merged_storet'):
                       on=['ActivityStartDate', 'ActivityMediaName',
                           'MonitoringLocationIdentifier','ResultMeasure/MeasureUnitCode'],
                       suffixes=('','_y'))
-
-    totalN = test['ResultMeasureValue'] + test['ResultMeasureValue_y']
+    
+    # XXX why is this field not a float by default?
+    totalN = test['ResultMeasureValue'].astype(float) + test['ResultMeasureValue_y'].astype(float)
 
     out = pd.DataFrame(columns=in_df.columns)
     out[storet.cols.result] = totalN.values
@@ -235,7 +233,7 @@ def only_columns_in_merged_table(merged_df, con, schema):
     merged_df :
     con : sqlalchemy connection
     """
-    query = """
+    query = f"""
     SELECT * FROM {schema}.merged_results LIMIT 0;
     """
     df = pd.read_sql_query(query, con=con)
@@ -270,6 +268,7 @@ def _merge_storet_for_site(con, schema, site, crosswalk_df, units_df, legacy=Fal
     SELECT * FROM {schema}.qwdata WHERE "site_no"='{usgs_code}';
     """
     nwis_df = pd.read_sql_query(query, con=con)
+    
     if not nwis_df.empty:
         #append to storet
         conversion_factor, parm_cd = nwis.conversion_factor(nwis_df,
@@ -282,7 +281,8 @@ def _merge_storet_for_site(con, schema, site, crosswalk_df, units_df, legacy=Fal
         # should rename or not name at all
         #return nwis_df
         nwis_df = nwis.to_storet(nwis_df, crosswalk_df, storet_site_id=site_name)
-        storet_df = storet_df.append(nwis_df, ignore_index=True)
+        #storet_df = storet_df.append(nwis_df, ignore_index=True)
+        storet_df = pd.concat([storet_df, nwis_df], ignore_index=True)
 
     if legacy:
         # load legacy storet data
@@ -304,7 +304,8 @@ def _merge_storet_for_site(con, schema, site, crosswalk_df, units_df, legacy=Fal
                                                 crosswalk_df,
                                                 storet_site_id=site_name)
 
-            storet_df = storet_df.append(lstoret_df, ignore_index=True)
+            #storet_df = storet_df.append(lstoret_df, ignore_index=True)
+            storet_df = pd.concat([storet_df, lstoret_df], ignore_index=True)
 
         # load legacy storet data 2
         # this was an alternate format provided by M. Short
@@ -329,7 +330,8 @@ def _merge_storet_for_site(con, schema, site, crosswalk_df, units_df, legacy=Fal
                                                  crosswalk_df,
                                                  storet_site_id=site_name)
 
-            storet_df = storet_df.append(lstoret2_df, ignore_index=True)
+            #storet_df = storet_df.append(lstoret2_df, ignore_index=True)
+            storet_df = pd.concat([storet_df, lstoret2_df], ignore_index=True)
 
     # drop duplicated values
     check_cols = [storet.cols.char,

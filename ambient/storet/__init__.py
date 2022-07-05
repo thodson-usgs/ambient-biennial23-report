@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 
 from dataretrieval.utils import format_datetime
-from awqmn.storet import cols
-from awqmn import nwis, sites, crosswalk
+from ambient.storet import cols
+from ambient import nwis, sites, crosswalk
 
 def to_wrtds(df, crosswalk_df, site_df):
     """ Format a STORET record for WRTDS
@@ -63,9 +63,12 @@ def site_to_wrtds(df, crosswalk_df, site):
     df : DataFrame
         A record in STORET format.
     """
-    # make a site_df
-    site_df = pd.DataFrame()
-    site_df = site_df.append(site)
+    #import pdb; pdb.set_trace()
+    # For sume reason I needed to reshape the site df
+    site_df = site.to_frame().T
+    #site_df = pd.DataFrame()
+    #site_df = site_df.append(site)
+    #site_df = pd.concat([site_df, site])
 
     # first check for gage
     if site[sites.cols.gage_id] is np.nan:
@@ -108,8 +111,8 @@ def _lookup_nwis_id(df, site_df, gage=False):
     """
     Parameters
     ----------
-    df : DataFrame
-        A STORET record.
+    #df : DataFrame
+    #    A STORET record.
     
     site : DataFrame
 
@@ -118,7 +121,7 @@ def _lookup_nwis_id(df, site_df, gage=False):
     """
     site_df = site_df.copy()
     site_df[sites.cols.storet_id] = 'IL_EPA_WQX-' + site_df[sites.cols.storet_id].values
-    #df[cols.site_id] = df[cols.site_id].values
+    ##df[cols.site_id] = df[cols.site_id].values
     out = df.merge(site_df,
                    left_on=cols.site_id,
                    right_on=sites.cols.storet_id,

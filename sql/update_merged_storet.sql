@@ -15,7 +15,7 @@ DELETE FROM ambient_2023.merged_storet WHERE
 ("CharacteristicName","ResultSampleFractionText")
 NOT IN
 --(SELECT DISTINCT "CharacteristicName","ResultSampleFractionText" FROM ambient_2023.wqp)
-(SELECT DISTINCT "characteristicname","resultsamplefraction" FROM ambient.srsnames)
+(SELECT DISTINCT "characteristicname","resultsamplefraction" FROM ambient_2023.srsnames)
 
 --(SELECT * FROM ambient_2023.union_water_param);
 -- only keep analysis found in STORET, otherwise we won't have current data

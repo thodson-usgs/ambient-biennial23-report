@@ -1,0 +1,11 @@
+name: ambient
+channels:
+  - anaconda
+  - conda-forge
+dependencies:
+  - ipykernel
+  - dataretrieval=1.0.1
+  - pandas
+  - sqlalchemy
+  - pip:
+    - git+https://github.com/thodson-usgs/ambient-biennial23-report.git

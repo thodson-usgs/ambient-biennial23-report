@@ -15,7 +15,13 @@ WHERE "ResultSampleFractionText" IS NULL;
 ------------------------------------------------------------------------------
 -- Update characteristic name
 -- problems with chlorphyl and pheoph, but not enough samples to warrant fix 
+UPDATE ambient_2023.wqp
+SET "CharacteristicName" = 'Inorganic nitrogen (nitrate and nitrite)'
+WHERE "CharacteristicName" = 'Inorganic nitrogen (nitrate and nitrite) ***retired***use Nitrate + Nitrite';
 
+UPDATE ambient_2023.wqp
+SET "CharacteristicName" = 'Inorganic nitrogen (nitrate and nitrite)'
+WHERE "CharacteristicName" = 'Nitrate + Nitrite';
 ------------------------------------------------------------------------------
 -- Update result sample fraction
 UPDATE ambient_2023.wqp

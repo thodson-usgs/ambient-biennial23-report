@@ -16,13 +16,13 @@
     </citation>
     <descript>
       <abstract>This data release contains estimates of annual nitrogen and phosphorus loads, as well as those of other constituents, from sites in the Illinois Environmental Protection Agency (Illinois EPA) Ambient Water Quality Monitoring Network. The loads were estimated using Weighted Regressions on Time, Discharge, and Season with Kalman filtering (WRTDS-K) and existing discrete water-quality data and discharge data collected by Illinois EPA, the U.S. Geological Survey, and Illinois State Water Survey through water year (WY) 2021. All water-quality and discharge data used in this work are available from the Water Quality Portal and the National Water Information System. 
-The data release comprises a single comma-separated values (CSV) file containing annual loads, load uncertainty, and sample counts for each Ambient monitoring station.</abstract>
+The data release comprises a single comma-separated values (CSV) file containing annual loads, load uncertainty, and sample counts for each Ambient monitoring station. Note that the 'site' column should be loaded as a string to avoid losing the leading zeros</abstract>
       <purpose>Data were obtained in order to assess the load nitrogen and phosphorus from Illinois watersheds to inform watershed management decisions.</purpose>
     </descript>
     <timeperd>
       <timeinfo>
         <rngdates>
-          <begdate>19551001</begdate>
+          <begdate>19761001</begdate>
           <enddate>20210930</enddate>
         </rngdates>
       </timeinfo>
@@ -101,7 +101,7 @@ The data release comprises a single comma-separated values (CSV) file containing
     </posacc>
     <lineage>
       <procstep>
-        <procdesc>Data collected included continuous estimates of discharge and discrete measurements of water quality from sites in the Illinois Environmental Protection Agency (IEPA) Ambient Water Quality Monitoring Network from 10/1/1955 through 9/30/2021. Of active IEPA ambient monitoring sites, only those with an associated USGS streamgage were used. Daily streamflow and water-quality data for each site were retrieved from the USGS National Water Information System (NWIS; U.S. Geological Survey 2022) and the National Water Quality Monitoring Council Water Quality Portal (WQP; http://www.waterqualitydata.us). Some historical data have not yet been migrated to WQP and are available from the STORET Legacy Data Center (https://www3.epa.gov/storet/legacy/gateway.htm). 
+        <procdesc>Data collected included continuous estimates of discharge and discrete measurements of water quality from sites in the Illinois Environmental Protection Agency (IEPA) Ambient Water Quality Monitoring Network from 10/1/1976 through 9/30/2021. Of active IEPA ambient monitoring sites, only those with an associated USGS streamgage were used. Daily streamflow and water-quality data for each site were retrieved from the USGS National Water Information System (NWIS; U.S. Geological Survey 2022) and the National Water Quality Monitoring Council Water Quality Portal (WQP; http://www.waterqualitydata.us). Some historical data have not yet been migrated to WQP and are available from the STORET Legacy Data Center (https://www3.epa.gov/storet/legacy/gateway.htm). 
 
 Reference:
 U.S. Geological Survey, 2022, National Water Information System data available on the World Wide Web (USGS Water Data for the Nation), accessed [August 10, 2022], at URL [http://waterdata.usgs.gov/nwis/].</procdesc>
@@ -207,7 +207,7 @@ Lee, C.J., Hirsch, R.M., and Crawford, C.G., 2019, An evaluation of methods for 
       </attr>
       <attr>
         <attrlabl>total nitrogen [kg]</attrlabl>
-        <attrdef>annual load of nitrogen in kilograms.</attrdef>
+        <attrdef>Annual load of nitrogen in kilograms.</attrdef>
         <attrdefs>producer defined.</attrdefs>
         <attrdomv>
           <edom>
@@ -226,7 +226,7 @@ Lee, C.J., Hirsch, R.M., and Crawford, C.G., 2019, An evaluation of methods for 
       </attr>
       <attr>
         <attrlabl>ammonia nitrogen [kg]</attrlabl>
-        <attrdef>annual load of nitrogen as ammonia in kilograms.</attrdef>
+        <attrdef>Annual load of nitrogen as ammonia in kilograms.</attrdef>
         <attrdefs>producer defined.</attrdefs>
         <attrdomv>
           <edom>
@@ -353,6 +353,25 @@ Lee, C.J., Hirsch, R.M., and Crawford, C.G., 2019, An evaluation of methods for 
           <rdom>
             <rdommin>252672</rdommin>
             <rdommax>4315697000</rdommax>
+            <attrunit>kilograms</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>iron [kg]</attrlabl>
+        <attrdef>Annual load of iron in kilograms.</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>&lt;empty&gt;</edomv>
+            <edomvd>No data.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>0</rdommax>
             <attrunit>kilograms</attrunit>
           </rdom>
         </attrdomv>
@@ -585,6 +604,25 @@ Lee, C.J., Hirsch, R.M., and Crawford, C.G., 2019, An evaluation of methods for 
         </attrdomv>
       </attr>
       <attr>
+        <attrlabl>iron [gse]</attrlabl>
+        <attrdef>Geometric standard error (GSE) of annual iron load. Geometric standard errors are multiplied/divided by the mean to yield the 1-sigma uncertainty interval.</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>&lt;empty&gt;</edomv>
+            <edomvd>No data.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>1.0</rdommin>
+            <rdommax>1.0</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
         <attrlabl>suspended sediment [gse]</attrlabl>
         <attrdef>Geometric standard error (GSE) of annual suspended sediment load. Geometric standard errors are multiplied/divided by the mean to yield the 1-sigma uncertainty interval.</attrdef>
         <attrdefs>Producer defined.</attrdefs>
@@ -808,6 +846,25 @@ Lee, C.J., Hirsch, R.M., and Crawford, C.G., 2019, An evaluation of methods for 
           <rdom>
             <rdommin>0</rdommin>
             <rdommax>43</rdommax>
+            <attrunit>number of samples collected</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>iron [count]</attrlabl>
+        <attrdef>Annual count of iron samples.</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>&lt;empty&gt;</edomv>
+            <edomvd>No data.</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>0</rdommax>
             <attrunit>number of samples collected</attrunit>
           </rdom>
         </attrdomv>

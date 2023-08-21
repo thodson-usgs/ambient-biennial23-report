@@ -9,16 +9,24 @@ def title_axes(ax):
     ax.set_xlabel( ax.get_xlabel().title())
     ax.set_ylabel( ax.get_ylabel().title())
     
+def percentage_scale(baseline, ax):
+    lim = ax.get_ylim()
+    ax2 = ax.twinx()
+    delta = (lim - baseline)/ baseline * 100
+    ax2.set_ylabel('[percentage]')
+    ax2.set_ylim(delta)
+    return ax2
     
-def annotate_difference(delta, loc, ax):
+def annotate_percentage_difference(recent_mean, baseline_mean, loc, ax):
     if loc is None:
         loc='upper right'
         
-    #delta = (recent_mean - baseline_mean)/ baseline_mean * 100
+    delta = (recent_mean - baseline_mean)/ baseline_mean * 100
     annotate_text = "Change: {:.1f}%".format(delta.values)
     #at = AnchoredText(annotate_text, prop=dict(size=10), frameon=False, loc=loc)
     at = AnchoredText(annotate_text, frameon=False, loc=loc)
     ax.add_artist(at)
+    
     
     
 def mean_and_se(ds, dim):
@@ -74,17 +82,27 @@ def running_average_plot(ds1,
     ds1.plot(marker='o', color='k', linestyle='None', markeredgecolor='k', markerfacecolor='None', ax=ax)
     ds2.plot(marker='o', color='k', linestyle='None', markeredgecolor='k', markerfacecolor='k', ax=ax)
 
-    #annotate_difference(p1_mean, p2_mean, loc, ax)
-    annotate_difference(p2_mean, loc, ax)
+    annotate_percentage_difference(p2_mean, p1_mean, loc, ax)
+    #annotate_difference(p2_mean, loc, ax)
     title_axes(ax)
 
     
 
-def append_total(ds, label='Statewide'):
-    total = ds.sum(dim='river').assign_coords({"river":label})
-    return xr.concat([total, ds], dim='river')
+def append_total(ds, label='Statewide', mode='load', da=None):
+    if mode=='load':
+        total = ds.sum(dim='river')
+    
+    elif mode=='yield':
+        total = ds.sum(dim='river')/da.sum()
+        ds = ds/da
+    
+    return xr.concat([total.assign_coords({"river":label}), ds], dim='river')
 
-def plot_change_by_basin(period1_ds, period2_ds, ax=None, color='k', statewide=False):
+
+#def plot_change_by_basin(period1_ds, period2_ds, ax=None, color='k', statewide=False):
+def plot_change_by_basin(period1_ds, period2_ds,
+                         ax=None, color='k',
+                         mode='load', da=None):
     '''
     ds1 = ambient_loads[parameter].sel(year=ambient_loads.year.dt.year.isin(baseline_years)).mean(dim='year')
     ds2 = supergage_loads[parameter].sel(year=supergage_loads.year.dt.year.isin(study_years)).mean(dim='year')
@@ -96,33 +114,44 @@ def plot_change_by_basin(period1_ds, period2_ds, ax=None, color='k', statewide=F
     # compute standard error of baseline
     #(p1-p2) / p3
     # first compute error in p1-p2
-    div = period1_ds.mean(dim='year')
-    if statewide:
-        div = div.sum()
-        
-
-    # append total
-    period1_ds = append_total(period1_ds)
-    period2_ds = append_total(period2_ds)
+    #div = period1_ds.mean(dim='year')
+    #if statewide:
+    #    div = div.sum()
+    title = period1_ds.name
     
-    if not statewide:
-        div = period1_ds.mean(dim='year')
+    # append total
+    period1_ds = append_total(period1_ds, mode=mode, da=da)
+    period2_ds = append_total(period2_ds, mode=mode, da=da)
+    
+    #if not statewide:
+    #    div = period1_ds.mean(dim='year')
 
     mean1, se1 = mean_and_se(period1_ds, dim='year')
     mean2, se2 = mean_and_se(period2_ds, dim='year')#ds.mean()
         
     difference = (mean2 - mean1).to_series()
-    difference_se = np.sqrt(se1**2 + se2**2)
+    difference_se = np.sqrt(se1**2 + se2**2).to_series()
 
         
-    difference = difference/div.values * 100
-    difference_se = difference_se/div.values * 100
+    #difference = difference/div.values * 100
+    #difference_se = difference_se/div.values * 100
+    
+    # append total
+    #period1_ds = append_total(period1_ds, mode=mode, da=da)
+    #period2_ds = append_total(period2_ds, mode=mode, da=da)
+    
+    
+    # compute percent contribution to statewide change
+    #if statewide:
+    #    difference /= difference['Statewide'] * 0.01
+    #    difference_se /= difference_se['Statewide'] * 0.01
 
     #title = period1_ds.name.title()
     
     difference.plot.bar(ax=ax, yerr=difference_se*1.96, color=color, edgecolor='k', capsize=4)
     
-    #ax.set_ylabel(f'{title} [{units}]')
+    units = period1_ds.pint.units
+    ax.set_ylabel(f'{title} [{units}]'.capitalize())
     ax.set_xlabel('')
     ax.axhline(y=0, lw=1, color='k')
     
